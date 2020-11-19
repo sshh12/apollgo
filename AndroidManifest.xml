@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	package="org.golang.todo.network"
+	package="io.sshh.apollgo"
     android:hardwareAccelerated="false"
 	android:versionCode="000001"
 	android:versionName="0.0.1">
@@ -9,7 +9,7 @@
 
 	<uses-permission android:name="android.permission.INTERNET" />
 
-	<application android:label="network" android:debuggable="true">
+	<application android:label="apollgo" android:debuggable="true">
 
 	<activity android:name="org.golang.app.GoNativeActivity"
 		android:label="network"

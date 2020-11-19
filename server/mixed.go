@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"bytes"
@@ -86,14 +86,12 @@ func (m *Mixed) Serve(c net.Conn) {
 		c.SetKeepAlive(true)
 	}
 
-	cc := proxy.NewConn(wrapperConn{conn: c})
+	cc := proxy.NewConn(NewMetricConn(c))
 	head, err := cc.Peek(1)
 	if err != nil {
-		// log.F("[mixed] socks5 peek error: %s", err)
 		return
 	}
 
-	// check socks5, client send socksversion: 5 as the first byte
 	if head[0] == socks5.Version {
 		m.socks5Server.Serve(cc)
 		return
