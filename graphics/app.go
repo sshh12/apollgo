@@ -1,6 +1,7 @@
 package graphics
 
 import (
+	"container/list"
 	"fmt"
 	"log"
 
@@ -21,6 +22,8 @@ func OnAppLaunch(app app.App) {
 	var cvb *xmobilebackend.XMobileBackendOffscreen
 	var painterb *xmobilebackend.XMobileBackend
 	var w, h int
+
+	speeds := list.New()
 
 	var glctx gl.Context
 	for e := range app.Events() {
@@ -55,22 +58,60 @@ func OnAppLaunch(app app.App) {
 		case paint.Event:
 			if glctx != nil {
 				fw, fh := float64(w), float64(h)
-
 				cvb.SetSize(w, h)
-
 				cv.SetFillStyle("#000")
 				cv.FillRect(0, 0, fw, fh)
-
-				cv.SetFillStyle(255, 0, 0)
-				cv.SetFont(nil, 50)
-				cv.FillText(fmt.Sprintf("Data %d / %d", server.TotalRead, server.TotalWrite), fw*0.1, fh*0.1)
-
+				speeds.PushBack(server.CurrentSpeed)
+				if speeds.Len() == w/2 {
+					speeds.Remove(speeds.Front())
+				}
+				draw(cv, fw, fh, speeds)
 				painterb.SetBounds(0, 0, w, h)
 				painter.DrawImage(cv)
-
 				app.Publish()
 				app.Send(paint.Event{})
 			}
 		}
 	}
+}
+
+func draw(cv *canvas.Canvas, w float64, h float64, speeds *list.List) {
+	md := w
+	if h > w {
+		md = h
+	}
+	cv.SetFillStyle(240, 240, 240)
+	cv.SetFont(nil, 50)
+	cv.FillText(fmt.Sprintf("Data %s / %s (%d conns)", byteCountSI(server.TotalRead), byteCountSI(server.TotalWrite), server.ActiveConn), md*0.1, md*0.1)
+	cv.FillText(fmt.Sprintf("Speed %s/s", byteCountSI(server.CurrentSpeed)), md*0.1, md*0.1+60)
+	cv.FillText(server.ExternalIP, md*0.1, md*0.1+120)
+
+	x := 0
+	var maxV int64 = 0
+	for e := speeds.Front(); e != nil; e = e.Next() {
+		v := e.Value.(int64)
+		cv.FillRect(float64(x), md*0.1+180, 2, float64(v)/10000+10)
+		x += 2
+		if v > maxV {
+			maxV = v
+		}
+	}
+	if maxV > 0 {
+		cv.SetFillStyle(0, 240, 240)
+		cv.FillRect(0, md*0.1+180+float64(maxV)/10000+10, w, 2)
+	}
+}
+
+func byteCountSI(b int64) string {
+	const unit = 1000
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB",
+		float64(b)/float64(div), "kMGTPE"[exp])
 }
