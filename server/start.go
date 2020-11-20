@@ -1,9 +1,10 @@
 package server
 
 import (
-	"errors"
+	"io/ioutil"
 	"log"
-	"net"
+	"net/http"
+	"strings"
 
 	"github.com/nadoo/glider/rule"
 )
@@ -33,38 +34,14 @@ func StartServer() {
 }
 
 func externalIP() (string, error) {
-	ifaces, err := net.Interfaces()
+	resp, err := http.Get("https://ifconfig.me/")
 	if err != nil {
 		return "", err
 	}
-	for _, iface := range ifaces {
-		if iface.Flags&net.FlagUp == 0 {
-			continue
-		}
-		if iface.Flags&net.FlagLoopback != 0 {
-			continue
-		}
-		addrs, err := iface.Addrs()
-		if err != nil {
-			return "", err
-		}
-		for _, addr := range addrs {
-			var ip net.IP
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ip = v.IP
-			case *net.IPAddr:
-				ip = v.IP
-			}
-			if ip == nil || ip.IsLoopback() {
-				continue
-			}
-			ip = ip.To4()
-			if ip == nil {
-				continue
-			}
-			return ip.String(), nil
-		}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
 	}
-	return "", errors.New("network error")
+	return strings.TrimSpace(string(body)), nil
 }

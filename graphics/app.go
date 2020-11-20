@@ -4,6 +4,8 @@ import (
 	"container/list"
 	"fmt"
 	"log"
+	"sync"
+	"time"
 
 	"github.com/sshh12/apollgo/server"
 
@@ -16,16 +18,50 @@ import (
 	"golang.org/x/mobile/gl"
 )
 
+type appState struct {
+	width  int
+	height int
+	read   *int64
+	write  *int64
+	speed  *int64
+	conns  *int64
+	ip     *string
+	speeds *list.List
+	lock   sync.Mutex
+}
+
 // OnAppLaunch handles app launch and event loop
 func OnAppLaunch(app app.App) {
 	var cv, painter *canvas.Canvas
 	var cvb *xmobilebackend.XMobileBackendOffscreen
 	var painterb *xmobilebackend.XMobileBackend
-	var w, h int
-
-	speeds := list.New()
-
 	var glctx gl.Context
+	state := &appState{
+		width:  0,
+		height: 0,
+		read:   &server.TotalRead,
+		write:  &server.TotalWrite,
+		speed:  &server.CurrentSpeed,
+		conns:  &server.ActiveConn,
+		ip:     &server.ExternalIP,
+		speeds: list.New(),
+		lock:   sync.Mutex{},
+	}
+	go func() {
+		frames := time.NewTicker(100 * time.Millisecond)
+		for {
+			select {
+			case <-frames.C:
+				state.lock.Lock()
+				state.speeds.PushBack(server.CurrentSpeed)
+				if state.speeds.Len() == state.width/2 {
+					state.speeds.Remove(state.speeds.Front())
+				}
+				state.lock.Unlock()
+				app.Send(paint.Event{})
+			}
+		}
+	}()
 	for e := range app.Events() {
 		switch e := app.Filter(e).(type) {
 		case lifecycle.Event:
@@ -54,43 +90,43 @@ func OnAppLaunch(app app.App) {
 				glctx = nil
 			}
 		case size.Event:
-			w, h = e.WidthPx, e.HeightPx
+			state.width, state.height = e.WidthPx, e.HeightPx
 		case paint.Event:
-			if glctx != nil {
-				fw, fh := float64(w), float64(h)
-				cvb.SetSize(w, h)
-				cv.SetFillStyle("#000")
-				cv.FillRect(0, 0, fw, fh)
-				speeds.PushBack(server.CurrentSpeed)
-				if speeds.Len() == w/2 {
-					speeds.Remove(speeds.Front())
-				}
-				draw(cv, fw, fh, speeds)
-				painterb.SetBounds(0, 0, w, h)
-				painter.DrawImage(cv)
-				app.Publish()
-				app.Send(paint.Event{})
-			}
+			doPaint(app, glctx, cvb, cv, painter, painterb, state)
 		}
 	}
 }
 
-func draw(cv *canvas.Canvas, w float64, h float64, speeds *list.List) {
-	md := w
-	if h > w {
-		md = h
+func doPaint(app app.App, glctx gl.Context, cvb *xmobilebackend.XMobileBackendOffscreen, cv *canvas.Canvas, painter *canvas.Canvas, painterb *xmobilebackend.XMobileBackend, state *appState) {
+	if glctx == nil || state.width == 0 || state.height == 0 {
+		return
 	}
+	fw, fh := float64(state.width), float64(state.height)
+	cvb.SetSize(state.width, state.height)
+	cv.SetFillStyle("#000")
+	cv.FillRect(0, 0, fw, fh)
+	draw(cv, fw, fh, state)
+	painterb.SetBounds(0, 0, state.width, state.height)
+	painter.DrawImage(cv)
+	app.Publish()
+	app.Send(paint.Event{})
+}
+
+func draw(cv *canvas.Canvas, w float64, h float64, state *appState) {
+	cx := 60.0
+	cy := 140.0
+	state.lock.Lock()
+	defer state.lock.Unlock()
 	cv.SetFillStyle(240, 240, 240)
 	cv.SetFont(nil, 50)
-	cv.FillText(fmt.Sprintf("Data %s / %s (%d conns)", byteCountSI(server.TotalRead), byteCountSI(server.TotalWrite), server.ActiveConn), md*0.1, md*0.1)
-	cv.FillText(fmt.Sprintf("Speed %s/s", byteCountSI(server.CurrentSpeed)), md*0.1, md*0.1+60)
-	cv.FillText(server.ExternalIP, md*0.1, md*0.1+120)
-
+	cv.FillText(fmt.Sprintf("Data %s / %s (%d conns)", byteCountSI(*state.read), byteCountSI(*state.write), *state.conns), cx, cy)
+	cv.FillText(fmt.Sprintf("Speed %s %d/s", byteCountSI(*state.speed), time.Now().Unix()), cx, cy+60)
+	cv.FillText(*state.ip, cx, cy+120)
 	x := 0
 	var maxV int64 = 0
-	for e := speeds.Front(); e != nil; e = e.Next() {
+	for e := state.speeds.Front(); e != nil; e = e.Next() {
 		v := e.Value.(int64)
-		cv.FillRect(float64(x), md*0.1+180, 2, float64(v)/10000+10)
+		cv.FillRect(float64(x), cy+180, 2, float64(v)/10000+10)
 		x += 2
 		if v > maxV {
 			maxV = v
@@ -98,7 +134,7 @@ func draw(cv *canvas.Canvas, w float64, h float64, speeds *list.List) {
 	}
 	if maxV > 0 {
 		cv.SetFillStyle(0, 240, 240)
-		cv.FillRect(0, md*0.1+180+float64(maxV)/10000+10, w, 2)
+		cv.FillRect(0, cy+180+float64(maxV)/10000+10, w, 2)
 	}
 }
 
