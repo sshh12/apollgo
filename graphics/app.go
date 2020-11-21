@@ -63,7 +63,7 @@ func OnAppLaunch(app app.App) {
 	go func() {
 		tick := time.NewTicker(15 * time.Minute)
 		for ; true; <-tick.C {
-			ip, err = server.ExternalIP()
+			ip, err := server.ExternalIP()
 			if err == nil {
 				state.ip = ip
 			}
@@ -151,6 +151,11 @@ func draw(cv *canvas.Canvas, w float64, h float64, state *appState) {
 		cv.SetFillStyle(0, 240, 240)
 		cv.FillRect(0, cy+240+float64(maxV)/10000+10, w, 2)
 	}
+	if state.dlSpeed > 0 {
+		cv.SetFillStyle(240, 0, 240)
+		cv.FillRect(0, cy+240+float64(state.dlSpeed)/10000+10, w, 2)
+	}
+
 }
 
 func byteCountSI(b int64) string {
