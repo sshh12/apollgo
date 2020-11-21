@@ -9,13 +9,8 @@ import (
 	"github.com/nadoo/glider/rule"
 )
 
-// ExternalIP is external IP
-var ExternalIP = ""
-
 // StartServer starts the glider server
 func StartServer() {
-
-	ExternalIP, _ = externalIP()
 
 	rules := []*rule.Config{}
 	stratCfg := &rule.StrategyConfig{}
@@ -33,7 +28,8 @@ func StartServer() {
 
 }
 
-func externalIP() (string, error) {
+// ExternalIP gets external ip
+func ExternalIP() (string, error) {
 	resp, err := http.Get("https://ifconfig.me/")
 	if err != nil {
 		return "", err

@@ -19,15 +19,17 @@ import (
 )
 
 type appState struct {
-	width  int
-	height int
-	read   *int64
-	write  *int64
-	speed  *int64
-	conns  *int64
-	ip     *string
-	speeds *list.List
-	lock   sync.Mutex
+	width   int
+	height  int
+	read    *int64
+	write   *int64
+	speed   *int64
+	conns   *int64
+	ip      string
+	dlSpeed int64
+	upSpeed int64
+	speeds  *list.List
+	lock    sync.Mutex
 }
 
 // OnAppLaunch handles app launch and event loop
@@ -37,29 +39,41 @@ func OnAppLaunch(app app.App) {
 	var painterb *xmobilebackend.XMobileBackend
 	var glctx gl.Context
 	state := &appState{
-		width:  0,
-		height: 0,
 		read:   &server.TotalRead,
 		write:  &server.TotalWrite,
 		speed:  &server.CurrentSpeed,
 		conns:  &server.ActiveConn,
-		ip:     &server.ExternalIP,
 		speeds: list.New(),
 		lock:   sync.Mutex{},
 	}
 	go func() {
-		frames := time.NewTicker(100 * time.Millisecond)
+		tick := time.NewTicker(100 * time.Millisecond)
 		for {
 			select {
-			case <-frames.C:
+			case <-tick.C:
 				state.lock.Lock()
 				state.speeds.PushBack(server.CurrentSpeed)
 				if state.speeds.Len() == state.width/2 {
 					state.speeds.Remove(state.speeds.Front())
 				}
 				state.lock.Unlock()
-				app.Send(paint.Event{})
 			}
+		}
+	}()
+	go func() {
+		tick := time.NewTicker(15 * time.Minute)
+		for ; true; <-tick.C {
+			ip, err = server.ExternalIP()
+			if err == nil {
+				state.ip = ip
+			}
+			dl, up, err := server.RunSpeedTest()
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			state.dlSpeed = int64(dl)
+			state.upSpeed = int64(up)
 		}
 	}()
 	for e := range app.Events() {
@@ -120,13 +134,14 @@ func draw(cv *canvas.Canvas, w float64, h float64, state *appState) {
 	cv.SetFillStyle(240, 240, 240)
 	cv.SetFont(nil, 50)
 	cv.FillText(fmt.Sprintf("Data %s / %s (%d conns)", byteCountSI(*state.read), byteCountSI(*state.write), *state.conns), cx, cy)
-	cv.FillText(fmt.Sprintf("Speed %s %d/s", byteCountSI(*state.speed), time.Now().Unix()), cx, cy+60)
-	cv.FillText(*state.ip, cx, cy+120)
+	cv.FillText(fmt.Sprintf("Transfer %s/s", byteCountSI(*state.speed)), cx, cy+60)
+	cv.FillText(fmt.Sprintf("SpeedTest %s/s %s/s", byteCountSI(state.dlSpeed), byteCountSI(state.upSpeed)), cx, cy+120)
+	cv.FillText(state.ip, cx, cy+180)
 	x := 0
 	var maxV int64 = 0
 	for e := state.speeds.Front(); e != nil; e = e.Next() {
 		v := e.Value.(int64)
-		cv.FillRect(float64(x), cy+180, 2, float64(v)/10000+10)
+		cv.FillRect(float64(x), cy+240, 2, float64(v)/10000+10)
 		x += 2
 		if v > maxV {
 			maxV = v
@@ -134,7 +149,7 @@ func draw(cv *canvas.Canvas, w float64, h float64, state *appState) {
 	}
 	if maxV > 0 {
 		cv.SetFillStyle(0, 240, 240)
-		cv.FillRect(0, cy+180+float64(maxV)/10000+10, w, 2)
+		cv.FillRect(0, cy+240+float64(maxV)/10000+10, w, 2)
 	}
 }
 
