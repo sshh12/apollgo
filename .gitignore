@@ -16,3 +16,5 @@
 *.temp.*
 *.apk
 dev.env.bat
+node_modules
+assets/
