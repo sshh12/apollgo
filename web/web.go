@@ -15,25 +15,22 @@ import (
 // SpaHandler for SPA
 type SpaHandler struct{}
 
+var extToContentType = map[string]string{
+	"html": "text/html; charset=utf-8",
+	"js":   "text/javascript; charset=UTF-8",
+	"svg":  "image/svg+xml",
+	"css":  "text/css; charset=UTF-8",
+	"json": "application/json; charset=UTF-8",
+	"png":  "image/png",
+}
+
 func serveAsset(w http.ResponseWriter, r *http.Request, file asset.File, ext string) {
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		w.Write([]byte(err.Error()))
 		return
 	}
-	if ext == "html" {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	} else if ext == "js" {
-		w.Header().Set("Content-Type", "text/javascript; charset=UTF-8")
-	} else if ext == "svg" {
-		w.Header().Set("Content-Type", "image/svg+xml")
-	} else if ext == "css" {
-		w.Header().Set("Content-Type", "text/css; charset=UTF-8")
-	} else if ext == "json" {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	} else if ext == "png" {
-		w.Header().Set("Content-Type", "image/png")
-	}
+	w.Header().Set("Content-Type", extToContentType[ext])
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 }
