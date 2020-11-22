@@ -1,12 +1,18 @@
 ﻿export default [
   {
-    path: '/home',
-    name: 'home',
-    icon: 'home',
-    component: './Home',
+    path: '/status',
+    name: 'status',
+    icon: 'CloudServerOutlined',
+    component: './Status',
+  },
+  {
+    path: '/config',
+    name: 'config',
+    icon: 'SettingOutlined',
+    component: './Config',
   },
   {
     path: '/',
-    redirect: '/home',
+    redirect: '/status',
   },
 ];
