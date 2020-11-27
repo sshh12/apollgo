@@ -5,7 +5,8 @@
   "description": "Apollgo",
   "scripts": {
     "build": "umi build",
-    "start": "umi dev"
+    "start": "umi dev",
+    "assets": "node mv-assets.js"
   },
   "lint-staged": {
     "**/*.less": "stylelint --syntax less",
@@ -64,6 +65,7 @@
     "eslint": "^7.1.0",
     "express": "^4.17.1",
     "gh-pages": "^3.0.0",
+    "glob": "^7.1.6",
     "jsdom-global": "^3.0.2",
     "lint-staged": "^10.0.0",
     "mockjs": "^1.0.1-beta3",
