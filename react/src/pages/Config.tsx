@@ -1,25 +1,68 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Card, Alert, Form, Button, Input, Select, InputNumber } from 'antd';
+import { Card, Alert, Form, Button, Input, Select, InputNumber, Spin } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import api from '../api';
 
 const { Option } = Select;
 
-export default (): React.ReactNode => (
-  <PageContainer>
-    <Alert
-      message={
-        <a target="_blank" href="https://github.com/nadoo/glider">
-          View supported configuration values and schemas
-        </a>
-      }
-      type="info"
-      showIcon
-    />
-    <br />
-    <InstanceConfig />
-  </PageContainer>
-);
+export default (): React.ReactNode => {
+  let [cfg, setCfg] = useState(null);
+  useEffect(() => {
+    api.get('/api/config').then((cfg) => {
+      cfg.listeners.map((list) => (list._id = Math.random().toString(32)));
+      setCfg(cfg);
+    });
+  }, []);
+  let addListener = () => {
+    let newCfg = JSON.parse(JSON.stringify(cfg));
+    let newList = JSON.parse(JSON.stringify(newCfg.listeners[0]));
+    newList._id = Math.random().toString(32);
+    newCfg.listeners.push(newList);
+    setCfg(newCfg);
+  };
+  let removeListener = (id) => {
+    let newCfg = JSON.parse(JSON.stringify(cfg));
+    if (newCfg.listeners.length <= 1) {
+      return;
+    }
+    newCfg.listeners = newCfg.listeners.filter(({ _id }) => _id != id);
+    setCfg(newCfg);
+  };
+  if (!cfg) {
+    return (
+      <PageContainer>
+        <Spin />
+      </PageContainer>
+    );
+  }
+  return (
+    <PageContainer>
+      <Alert
+        message={
+          <a target="_blank" href="https://github.com/nadoo/glider">
+            View supported configuration values and schemas
+          </a>
+        }
+        type="info"
+        showIcon
+      />
+      <br />
+      {cfg.listeners.map((list) => {
+        return (
+          <div key={list._id}>
+            <ListenerConfig
+              listener={list}
+              add={addListener}
+              remove={() => removeListener(list._id)}
+            />
+            <br />
+          </div>
+        );
+      })}
+    </PageContainer>
+  );
+};
 
 const formItemProps = {
   style: { width: '90%' },
@@ -39,12 +82,15 @@ const formItemPropsWithOutLabel = {
   },
 };
 
-const InstanceConfig = () => {
+const ListenerConfig = ({ listener, add, remove }) => {
   return (
     <Card>
       <Form requiredMark={false} {...formItemPropsWithOutLabel} onFinish={console.log}>
         <Form.Item label="Listener" required={true} {...formItemProps}>
-          <Input placeholder="SCHEME://[USER|METHOD:PASSWORD@][HOST]:PORT?PARAMS" />
+          <Input
+            placeholder="SCHEME://[USER|METHOD:PASSWORD@][HOST]:PORT?PARAMS"
+            defaultValue={listener.uri}
+          />
         </Form.Item>
         <Form.List name="forwarders">
           {(fields, { add, remove }, { errors }) => (
@@ -110,9 +156,13 @@ const InstanceConfig = () => {
         </Form.Item>
         <br />
         <Form.Item {...formItemProps}>
-          <Button type="primary">Save All</Button>
-          <Button type="default">Delete</Button>
-          <Button type="link">Add Listener</Button>
+          <Button type="primary">Apply All</Button>
+          <Button type="default" onClick={remove}>
+            Delete
+          </Button>
+          <Button type="link" onClick={add}>
+            Add Listener
+          </Button>
         </Form.Item>
       </Form>
     </Card>

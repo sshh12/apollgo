@@ -1,4 +1,4 @@
-package graphics
+package app
 
 import (
 	"log"
@@ -59,7 +59,7 @@ func OnAppLaunch(app app.App) {
 				cv.SetFillStyle("#222")
 				cv.SetTextAlign(canvas.Center)
 				cv.SetTextBaseline(canvas.Middle)
-				cv.FillText("http://127.0.0.1:8888", fw / 2, fh / 2)
+				cv.FillText("http://127.0.0.1:8888", fw/2, fh/2)
 				painterb.SetBounds(0, 0, width, height)
 				painter.DrawImage(cv)
 				app.Publish()

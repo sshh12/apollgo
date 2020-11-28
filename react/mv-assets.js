@@ -12,6 +12,7 @@ glob('../react/dist/**/*.*', {}, (err, files) => {
       '../assets',
       fn.replace('/', '__').replace('\\', '__').replace('..__react/dist/', ''),
     );
+    console.log(newFn);
     fs.mkdir(path.dirname(newFn), { recursive: true }, (err) => {
       if (err) {
         console.warn(err);

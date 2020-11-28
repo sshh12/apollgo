@@ -1,13 +1,15 @@
 package main
 
 import (
-	"github.com/sshh12/apollgo/graphics"
+	"github.com/sshh12/apollgo/app"
 	"github.com/sshh12/apollgo/web"
-	"golang.org/x/mobile/app"
+	mobileapp "golang.org/x/mobile/app"
 )
 
 func main() {
+	state := app.NewAppState()
+	go state.Run()
+	go web.ServeWebApp(state)
 	// go server.StartServer()
-	go web.ServeSPA()
-	app.Main(graphics.OnAppLaunch)
+	mobileapp.Main(app.OnAppLaunch)
 }

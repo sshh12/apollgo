@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/sshh12/apollgo/app"
 	"golang.org/x/mobile/asset"
 )
 
@@ -56,14 +57,19 @@ func (h SpaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ServeSPA starts the react server
-func ServeSPA() {
+// ServeWebApp starts http server
+func ServeWebApp(state *app.State) {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 	})
-
+	router.HandleFunc("/api/config", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(state.GetCfg())
+	})
+	router.HandleFunc("/api/status", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(state.GetStatus())
+	})
 	router.PathPrefix("/").Handler(SpaHandler{})
 
 	srv := &http.Server{
