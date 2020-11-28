@@ -40,7 +40,7 @@ export default (): React.ReactNode => {
     <PageContainer>
       <Alert
         message={
-          <a target="_blank" href="https://github.com/nadoo/glider">
+          <a target="_blank" href="https://github.com/nadoo/glider#protocols">
             View supported configuration values and schemas
           </a>
         }

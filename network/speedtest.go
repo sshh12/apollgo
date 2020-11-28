@@ -31,5 +31,5 @@ func RunSpeedTest() (float64, float64, float64, error) {
 	s.PingTest()
 	s.DownloadTest()
 	s.UploadTest()
-	return s.DLSpeed, s.ULSpeed, float64(s.Latency / time.Millisecond), nil
+	return s.DLSpeed / 8, s.ULSpeed / 8, float64(s.Latency / time.Millisecond), nil
 }
