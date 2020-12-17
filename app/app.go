@@ -14,7 +14,7 @@ type State struct {
 
 // Status is app status
 type Status struct {
-	IP string `json:"ip"`
+	IP      string  `json:"ip"`
 	DLSpeed float64 `json:"dlSpeed"`
 	ULSpeed float64 `json:"ulSpeed"`
 	Latency float64 `json:"latency"`
@@ -23,9 +23,9 @@ type Status struct {
 // NewAppState creates default state
 func NewAppState() *State {
 	return &State{
-		cfg:    DefaultCfg,
+		cfg: DefaultCfg,
 		status: &Status{
-			IP: "0.0.0.0",
+			IP:      "0.0.0.0",
 			DLSpeed: 0,
 			ULSpeed: 0,
 			Latency: 0,

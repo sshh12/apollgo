@@ -59,6 +59,8 @@ func (h SpaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // ServeWebApp starts http server
 func ServeWebApp(state *app.State) {
+
+	initCfg := state.GetCfg()
 	router := mux.NewRouter()
 
 	router.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +76,7 @@ func ServeWebApp(state *app.State) {
 
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         "0.0.0.0:8888",
+		Addr:         fmt.Sprintf("0.0.0.0:%d", initCfg.ApollgoPort),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}

@@ -1,15 +1,15 @@
 package network
 
 import (
-	"time"
 	"fmt"
-	"sort"
 	"github.com/showwin/speedtest-go/speedtest"
+	"sort"
+	"time"
 )
 
 // RunSpeedTest runs a speedtest
 func RunSpeedTest() (float64, float64, float64, error) {
-	user, err:= speedtest.FetchUserInfo()
+	user, err := speedtest.FetchUserInfo()
 	if err != nil {
 		return 0, 0, 0, err
 	}
@@ -17,7 +17,7 @@ func RunSpeedTest() (float64, float64, float64, error) {
 	if err != nil {
 		return 0, 0, 0, err
 	}
-	targets,  err := serverList.FindServer([]int{})
+	targets, err := serverList.FindServer([]int{})
 	if err != nil {
 		return 0, 0, 0, err
 	}
