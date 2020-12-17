@@ -1,0 +1,66 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js start
+
+PATH: 
+  C:\ProgramData\Anaconda3;C:\ProgramData\Anaconda3\Library\mingw-w64\bin;C:\ProgramData\Anaconda3\Library\usr\bin;C:\ProgramData\Anaconda3\Library\bin;C:\ProgramData\Anaconda3\Scripts;C:\ProgramData\Anaconda3\bin;C:\ProgramData\Anaconda3\condabin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\extras\CUPTI\lib64;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin;C:\tools\cuda\bin;C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\bin;C:\Perl64\bin;C:\Program Files\CMake\bin;C:\Dev\bin\ethminer;C:\Go\bin;C:\Program Files\heroku\bin;C:\Program Files\Amazon\AWSCLIV2;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\Google\Chrome\Application;C:\Dev\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Perl64\bin;C:\Users\Shriv\AppData\Roaming\ActiveState\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\libnvvp;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files\PuTTY;C:\Program Files\Microsoft VS Code\bin;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\ProgramData\Anaconda3\Scripts;C:\Dev\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files (x86)\Yarn\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2019.4.0;C:\Program Files\MATLAB\R2020a\bin;C:\Program Files\Amazon\AWSCLIV2;C:\Go\bin;C:\Program Files\CMake\bin;C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\bin;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Users\Shriv\AppData\Local\Microsoft\WindowsApps;C:\Users\Shriv\AppData\Roaming\npm;C:\Users\Shriv\AppData\Local\Yarn\bin;C:\Users\Shriv\AppData\Roaming\TinyTeX\bin\win32;C:\Program Files\heroku\bin;C:\Users\Shriv\go\bin
+
+Yarn version: 
+  1.22.5
+
+Node version: 
+  14.9.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  SyntaxError: C:\Dev\sshh12\go-pad\package.json: Unexpected token } in JSON at position 418
+      at JSON.parse (<anonymous>)
+      at C:\Program Files (x86)\Yarn\lib\cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (C:\Program Files (x86)\Yarn\lib\cli.js:310:30)
+      at C:\Program Files (x86)\Yarn\lib\cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "go-pad",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+      "@testing-library/jest-dom": "^5.11.4",
+      "@testing-library/react": "^11.1.0",
+      "@testing-library/user-event": "^12.1.10",
+      "react": "^17.0.1",
+      "react-dom": "^17.0.1",
+      "react-scripts": "4.0.1",
+      "web-vitals": "^0.2.4"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+    },
+    "eslintConfig": {
+      "extends": [
+        "react-app",
+        "react-app/jest"
+      ]
+    },
+    "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

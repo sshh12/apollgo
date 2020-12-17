@@ -1,81 +1,36 @@
 {
   "name": "apollgo",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "Apollgo",
-  "scripts": {
-    "build": "umi build",
-    "start": "umi dev",
-    "assets": "node mv-assets.js"
+  "dependencies": {
+    "@rebass/forms": "^4.0.6",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.1",
+    "rebass": "^4.0.7",
+    "theme-ui": "^0.3.4"
   },
-  "lint-staged": {
-    "**/*.less": "stylelint --syntax less",
-    "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
-    "**/*.{js,jsx,tsx,ts,less,md,json}": [
-      "prettier --write"
+  "scripts": {
+    "dev": "react-scripts start",
+    "build": "react-scripts build",
+    "build:assets": "react-scripts build && node mv-assets.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
     ]
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 10"
-  ],
-  "dependencies": {
-    "@ant-design/icons": "^4.0.0",
-    "@ant-design/pro-descriptions": "^1.0.19",
-    "@ant-design/pro-form": "^1.2.0",
-    "@ant-design/pro-layout": "^6.4.19",
-    "@ant-design/pro-table": "^2.9.5",
-    "@umijs/route-utils": "^1.0.33",
-    "antd": "^4.7.0",
-    "classnames": "^2.2.6",
-    "lodash": "^4.17.11",
-    "moment": "^2.25.3",
-    "omit.js": "^2.0.2",
-    "qs": "^6.9.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-helmet-async": "^1.0.4",
-    "umi": "^3.2.28",
-    "umi-request": "^1.0.8",
-    "use-merge-value": "^1.0.1"
-  },
-  "devDependencies": {
-    "@ant-design/pro-cli": "^2.0.2",
-    "@types/classnames": "^2.2.7",
-    "@types/express": "^4.17.0",
-    "@types/history": "^4.7.2",
-    "@types/jest": "^26.0.0",
-    "@types/lodash": "^4.14.144",
-    "@types/qs": "^6.5.3",
-    "@types/react": "^16.9.17",
-    "@types/react-dom": "^16.8.4",
-    "@types/react-helmet": "^6.1.0",
-    "@umijs/fabric": "^2.3.0",
-    "@umijs/plugin-blocks": "^2.0.5",
-    "@umijs/plugin-esbuild": "^1.0.0-beta.2",
-    "@umijs/preset-ant-design-pro": "^1.2.0",
-    "@umijs/preset-react": "^1.4.8",
-    "@umijs/yorkie": "^2.0.3",
-    "carlo": "^0.9.46",
-    "cross-env": "^7.0.0",
-    "cross-port-killer": "^1.1.1",
-    "detect-installer": "^1.0.1",
-    "enzyme": "^3.11.0",
-    "eslint": "^7.1.0",
-    "express": "^4.17.1",
-    "gh-pages": "^3.0.0",
-    "glob": "^7.1.6",
-    "jsdom-global": "^3.0.2",
-    "lint-staged": "^10.0.0",
-    "mockjs": "^1.0.1-beta3",
-    "prettier": "^2.0.1",
-    "pro-download": "1.0.1",
-    "puppeteer-core": "^5.0.0",
-    "stylelint": "^13.0.0",
-    "typescript": "^4.0.3"
-  },
-  "engines": {
-    "node": ">=10.0.0"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
