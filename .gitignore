@@ -19,3 +19,4 @@ dev.env.bat
 node_modules
 assets/
 react/build
+.eslintcache

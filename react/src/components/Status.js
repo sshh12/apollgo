@@ -14,8 +14,8 @@ export default function Status({ status }) {
         <Box width={1 / 2}>
           <Card>
             <Heading>Metrics</Heading>
-            <Text>{status?.dlSpeed} Mb/s &darr;</Text>
-            <Text>{status?.ulSpeed} Mb/s &uarr;</Text>
+            <Text>{Math.round(status?.dlSpeed * 100) / 100} Mb/s &darr;</Text>
+            <Text>{Math.round(status?.ulSpeed * 100) / 100} Mb/s &uarr;</Text>
             <Text>{status?.latency} ms</Text>
           </Card>
         </Box>

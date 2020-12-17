@@ -16,15 +16,15 @@ var DefaultCfg = &Config{
 
 // Config server config
 type Config struct {
-	Listeners     []ListenerConfig `json:"listeners"`
-	ApollgoPort   int              `json:"apollgoPort"`
-	Check         string           `json:"check"`
-	CheckInterval int              `json:"checkInterval"`
+	Listeners   []ListenerConfig `json:"listeners"`
+	ApollgoPort int              `json:"apollgoPort"`
 }
 
 // ListenerConfig config for listeners
 type ListenerConfig struct {
-	URI        string   `json:"uri"`
-	Strategy   string   `json:"strategy"`
-	Forwarders []string `json:"forwarders"`
+	URI           string   `json:"uri"`
+	Strategy      string   `json:"strategy"`
+	Forwarders    []string `json:"forwarders"`
+	Check         string   `json:"check"`
+	CheckInterval int      `json:"checkInterval"`
 }

@@ -31,8 +31,10 @@ function App() {
   }, []);
   let applyConfig = (newCfg) => {
     setLoading(true);
-    setConfig(newCfg);
-    setLoading(false);
+    api.put('/api/config', newCfg).then((cfg) => {
+      setConfig(cfg);
+      setLoading(false);
+    });
   };
   let TabView = TABS[tab];
   return (

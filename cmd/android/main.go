@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	state := app.NewAppState()
-	go state.Run()
-	go web.ServeWebApp(state)
+	apollgo := app.NewApollgoApp("/sdcard/apollgo.json")
+	go apollgo.Run()
+	go web.ServeWebApp(apollgo)
 	// go server.StartServer()
 	mobileapp.Main(app.OnAppLaunch)
 }

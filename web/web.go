@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"fmt"
+
 	"github.com/gorilla/mux"
 	"github.com/sshh12/apollgo/app"
 	"golang.org/x/mobile/asset"
@@ -58,19 +60,27 @@ func (h SpaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // ServeWebApp starts http server
-func ServeWebApp(state *app.State) {
+func ServeWebApp(apollgo *app.ApollgoApp) {
 
-	initCfg := state.GetCfg()
+	initCfg := apollgo.GetCfg()
 	router := mux.NewRouter()
 
 	router.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 	})
 	router.HandleFunc("/api/config", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(state.GetCfg())
+		if r.Method == "PUT" {
+			var newCfg app.Config
+			if err := json.NewDecoder(r.Body).Decode(&newCfg); err != nil {
+				apollgo.Log(err.Error())
+			} else {
+				apollgo.SetCfg(&newCfg)
+			}
+		}
+		json.NewEncoder(w).Encode(apollgo.GetCfg())
 	})
 	router.HandleFunc("/api/status", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(state.GetStatus())
+		json.NewEncoder(w).Encode(apollgo.GetStatus())
 	})
 	router.PathPrefix("/").Handler(SpaHandler{})
 
