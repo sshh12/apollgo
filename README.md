@@ -1,6 +1,8 @@
 # apollgo
 
-> An android app for hosting a variety of proxy servers, proxy chains, and port forwarding (via [glider](https://github.com/nadoo/glider) and [hermes](https://github.com/sshh12/hermes)).
+> An Android app for hosting a variety of proxy servers, proxy chains, and port forwarding (via [glider](https://github.com/nadoo/glider) and [hermes](https://github.com/sshh12/hermes)).
+
+![demo](https://user-images.githubusercontent.com/6625384/102667166-5ee12500-414e-11eb-9a0c-4c179186f500.gif)
 
 ## Install
 
