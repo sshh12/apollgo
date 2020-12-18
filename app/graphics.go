@@ -30,17 +30,17 @@ func OnAppLaunch(app app.App) {
 				ctx, err := xmobilebackend.NewGLContext(glctx)
 				if err != nil {
 					fmt.Print(err)
-					continue
+					return
 				}
 				cvb, err = xmobilebackend.NewOffscreen(0, 0, false, ctx)
 				if err != nil {
 					fmt.Print(err)
-					continue
+					return
 				}
 				painterb, err = xmobilebackend.New(0, 0, 0, 0, ctx)
 				if err != nil {
 					fmt.Print(err)
-					continue
+					return
 				}
 				cv = canvas.New(cvb)
 				cv.LoadFont(robotoFont)

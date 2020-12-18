@@ -13,7 +13,7 @@ func main() {
 	apollgo := app.NewApollgoApp("/sdcard/apollgo.json")
 	go apollgo.Run()
 	go web.ServeWebApp(apollgo)
-	gliderlog.F = func(s string, v ...interface{}) { apollgo.Log(fmt.Sprintf(s, v)) }
+	gliderlog.F = func(s string, v ...interface{}) { apollgo.Log(fmt.Sprintf(s, v...)) }
 	initCfg := apollgo.GetCfg()
 	if err := network.ServeGlider(initCfg.Listeners); err != nil {
 		apollgo.Log(err.Error())

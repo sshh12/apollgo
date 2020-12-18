@@ -1,8 +1,13 @@
 package network
 
 import (
+	"github.com/nadoo/glider/dns"
 	"github.com/nadoo/glider/proxy"
 	"github.com/nadoo/glider/rule"
+	"net"
+
+	"context"
+	"time"
 	// proto support
 	_ "github.com/nadoo/glider/proxy/http"
 	_ "github.com/nadoo/glider/proxy/kcp"
@@ -60,6 +65,10 @@ func runListener(listener *ListenerConfig) error {
 		Strategy:      listener.Strategy,
 		Check:         listener.Check,
 		CheckInterval: listener.CheckInterval,
+		MaxFailures:   listener.MaxFailures,
+		DialTimeout:   listener.DialTimeout,
+		RelayTimeout:  listener.RelayTimeout,
+		IntFace:       listener.IntFace,
 	}
 	forwarders := make([]string, 0)
 	for _, forward := range listener.Forwarders {
@@ -68,6 +77,30 @@ func runListener(listener *ListenerConfig) error {
 		}
 	}
 	pxy := rule.NewProxy(forwarders, strat, rules)
+	if listener.DNSListener != "" {
+		dnsConfig := &dns.Config{
+			Servers:   listener.DNSServers,
+			Timeout:   listener.DNSTimeout,
+			MaxTTL:    listener.DNSMaxTTL,
+			MinTTL:    listener.DNSMinTTL,
+			Records:   listener.DNSRecords,
+			AlwaysTCP: listener.DNSAlwaysTCP,
+			CacheSize: listener.DNSCacheSize,
+		}
+		d, err := dns.NewServer(listener.DNSListener, pxy, dnsConfig)
+		if err != nil {
+			return err
+		}
+		d.AddHandler(pxy.AddDomainIP)
+		d.Start()
+		net.DefaultResolver = &net.Resolver{
+			PreferGo: true,
+			Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+				d := net.Dialer{Timeout: time.Second * 3}
+				return d.DialContext(ctx, "udp", listener.DNSListener)
+			},
+		}
+	}
 	pxy.Check()
 	for _, uri := range listener.URIs {
 		if uri == "" {

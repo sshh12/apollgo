@@ -58,7 +58,7 @@ func NewApollgoApp(cfgFn string) *ApollgoApp {
 
 // Run starts misc tasks
 func (s *ApollgoApp) Run() {
-	ticker := time.NewTicker(300 * time.Second)
+	ticker := time.NewTicker(2 * time.Hour)
 	for ; true; <-ticker.C {
 		if ip, err := network.ExternalIP(); err == nil {
 			s.status.IP = ip
@@ -77,14 +77,13 @@ func (s *ApollgoApp) Run() {
 
 // Log logs something
 func (s *ApollgoApp) Log(val string) {
-	fmt.Println("[APOLLGO] " + val)
-	newLog := LogLine{
-		Text: val,
-		Time: time.Now().Unix(),
-	}
 	s.statusLock.Lock()
 	defer s.statusLock.Unlock()
 	s.status.Logs = append(s.status.Logs, newLog)
+	if len(s.status.Logs) > 1000 {
+		extra := 1000 - len(s.status.Logs)
+		s.status.Logs = s.status.Logs[extra:]
+	}
 }
 
 // GetCfg gets config

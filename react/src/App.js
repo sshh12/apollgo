@@ -49,6 +49,7 @@ function App() {
     api.put('/api/config', newCfg).then((cfg) => {
       setConfig(cfg);
       setLoading(false);
+      alert('Restart the app for the new config to take effect.');
     });
   };
   let TabView = TABS[tab];

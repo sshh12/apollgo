@@ -206,13 +206,9 @@ function ListenerSettingsCard({ list, listIdx, edit, del }) {
             key={'dnsrecords'}
             label={'include these records'}
             value={list.dnsRecords}
-            validate={(v) =>
-              !!v.match(
-                /(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))\/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/
-              )
-            }
+            validate={(v) => !!v.match(/[\w\.]+\/[A-Za-z0-9\.\.]+/)}
             onChange={(v) => {
-              edit({ ...list, dnsServers: v });
+              edit({ ...list, dnsRecords: v });
             }}
           />
         </Box>
