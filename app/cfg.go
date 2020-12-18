@@ -1,10 +1,12 @@
 package app
 
+import "github.com/sshh12/apollgo/network"
+
 // DefaultCfg default config
 var DefaultCfg = &Config{
 	ApollgoPort: 8888,
-	Listeners: []ListenerConfig{
-		ListenerConfig{
+	Listeners: []network.ListenerConfig{
+		network.ListenerConfig{
 			URI:           "socks5://0.0.0.0:3080",
 			Strategy:      "rr",
 			Check:         "https://google.com",
@@ -16,15 +18,6 @@ var DefaultCfg = &Config{
 
 // Config server config
 type Config struct {
-	Listeners   []ListenerConfig `json:"listeners"`
-	ApollgoPort int              `json:"apollgoPort"`
-}
-
-// ListenerConfig config for listeners
-type ListenerConfig struct {
-	URI           string   `json:"uri"`
-	Strategy      string   `json:"strategy"`
-	Forwarders    []string `json:"forwarders"`
-	Check         string   `json:"check"`
-	CheckInterval int      `json:"checkInterval"`
+	Listeners   []network.ListenerConfig `json:"listeners"`
+	ApollgoPort int                      `json:"apollgoPort"`
 }

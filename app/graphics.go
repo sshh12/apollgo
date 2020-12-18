@@ -1,7 +1,7 @@
 package app
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/tfriedel6/canvas"
 	"github.com/tfriedel6/canvas/backend/xmobilebackend"
@@ -29,15 +29,18 @@ func OnAppLaunch(app app.App) {
 				glctx = e.DrawContext.(gl.Context)
 				ctx, err := xmobilebackend.NewGLContext(glctx)
 				if err != nil {
-					log.Fatal(err)
+					fmt.Print(err)
+					continue
 				}
 				cvb, err = xmobilebackend.NewOffscreen(0, 0, false, ctx)
 				if err != nil {
-					log.Fatalln(err)
+					fmt.Print(err)
+					continue
 				}
 				painterb, err = xmobilebackend.New(0, 0, 0, 0, ctx)
 				if err != nil {
-					log.Fatalln(err)
+					fmt.Print(err)
+					continue
 				}
 				cv = canvas.New(cvb)
 				cv.LoadFont(robotoFont)

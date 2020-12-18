@@ -5,11 +5,13 @@ import theme from './theme';
 import { Box, Text, Flex, Link } from 'rebass';
 import Glider from './components/Glider';
 import Status from './components/Status';
+import Logs from './components/Logs';
 import api from './api';
 
 const TABS = {
   status: Status,
-  glider: Glider
+  glider: Glider,
+  logs: Logs
 };
 
 function getTab() {
@@ -25,8 +27,21 @@ function App() {
   let [status, setStatus] = useState(null);
   let [config, setConfig] = useState(null);
   let [loading, setLoading] = useState(false);
+  let [lostConn, setLostConn] = useState(false);
   useEffect(() => {
     api.get('/api/status').then(setStatus);
+    setInterval(() => {
+      api
+        .get('/api/status')
+        .then((status) => {
+          setStatus(status);
+          setLostConn(false);
+        })
+        .catch((err) => {
+          console.warn(err);
+          setLostConn(true);
+        });
+    }, 10 * 1000);
     api.get('/api/config').then(setConfig);
   }, []);
   let applyConfig = (newCfg) => {
@@ -45,12 +60,16 @@ function App() {
             apollgo
           </Text>
           {loading && <Text p={2}>*loading*</Text>}
+          {lostConn && <Text p={2}>*connection lost*</Text>}
           <Box mx="auto" />
           {Object.keys(TABS).map((tb) => (
             <Link
               key={tb}
               href="#"
-              onClick={() => setTab(tb)}
+              onClick={() => {
+                setTab(tb);
+                window.history.pushState({}, '', '/' + tb);
+              }}
               sx={{
                 display: 'inline-block',
                 fontWeight: 'bold',

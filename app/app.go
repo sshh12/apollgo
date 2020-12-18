@@ -5,22 +5,31 @@ import (
 	"fmt"
 	"github.com/sshh12/apollgo/network"
 	"io/ioutil"
+	"sync"
 	"time"
 )
 
 // ApollgoApp is global app state
 type ApollgoApp struct {
-	cfg    *Config
-	status *Status
-	cfgFn  string
+	cfg        *Config
+	status     *Status
+	cfgFn      string
+	statusLock sync.Mutex
+}
+
+// LogLine is a single log
+type LogLine struct {
+	Text string `json:"text"`
+	Time int64  `json:"time"`
 }
 
 // Status is app status
 type Status struct {
-	IP      string  `json:"ip"`
-	DLSpeed float64 `json:"dlSpeed"`
-	ULSpeed float64 `json:"ulSpeed"`
-	Latency float64 `json:"latency"`
+	IP      string    `json:"ip"`
+	DLSpeed float64   `json:"dlSpeed"`
+	ULSpeed float64   `json:"ulSpeed"`
+	Latency float64   `json:"latency"`
+	Logs    []LogLine `json:"logs"`
 }
 
 // NewApollgoApp creates default state
@@ -43,6 +52,7 @@ func NewApollgoApp(cfgFn string) *ApollgoApp {
 			ULSpeed: 0,
 			Latency: 0,
 		},
+		statusLock: sync.Mutex{},
 	}
 }
 
@@ -68,6 +78,13 @@ func (s *ApollgoApp) Run() {
 // Log logs something
 func (s *ApollgoApp) Log(val string) {
 	fmt.Println("[APOLLGO] " + val)
+	newLog := LogLine{
+		Text: val,
+		Time: time.Now().Unix(),
+	}
+	s.statusLock.Lock()
+	defer s.statusLock.Unlock()
+	s.status.Logs = append(s.status.Logs, newLog)
 }
 
 // GetCfg gets config
@@ -91,5 +108,7 @@ func (s *ApollgoApp) SetCfg(newCfg *Config) {
 
 // GetStatus gets status
 func (s *ApollgoApp) GetStatus() *Status {
+	s.statusLock.Lock()
+	defer s.statusLock.Unlock()
 	return s.status
 }
