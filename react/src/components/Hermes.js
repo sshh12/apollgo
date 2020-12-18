@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, Heading, Flex, Button, Text } from 'rebass';
-import { Label, Input, Select, Checkbox, Switch } from '@rebass/forms';
+import { Box, Flex, Button } from 'rebass';
+import { Switch } from '@rebass/forms';
 import TextInput from './TextInput';
 import CSVInput from './CSVInput';
 

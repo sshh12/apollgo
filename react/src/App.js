@@ -28,6 +28,7 @@ function App() {
   let [tab, setTab] = useState(getTab());
   let [status, setStatus] = useState(null);
   let [config, setConfig] = useState(null);
+  let [defaults, setDefaults] = useState(null);
   let [loading, setLoading] = useState(false);
   let [lostConn, setLostConn] = useState(false);
   useEffect(() => {
@@ -45,6 +46,7 @@ function App() {
         });
     }, 10 * 1000);
     api.get('/api/config').then(setConfig);
+    api.get('/api/config/defaults').then(setDefaults);
   }, []);
   let applyConfig = (newCfg) => {
     setLoading(true);
@@ -85,7 +87,12 @@ function App() {
             </Link>
           ))}
         </Flex>
-        <TabView status={status} config={config} setConfig={applyConfig} />
+        <TabView
+          status={status}
+          config={config}
+          setConfig={applyConfig}
+          defaults={defaults}
+        />
       </div>
     </ThemeProvider>
   );

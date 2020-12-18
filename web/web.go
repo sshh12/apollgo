@@ -87,12 +87,15 @@ func ServeWebApp(apollgo *app.ApollgoApp) {
 	})
 	router.PathPrefix("/").Handler(SpaHandler{})
 
+	addr := fmt.Sprintf("0.0.0.0:%d", initCfg.ApollgoPort)
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         fmt.Sprintf("0.0.0.0:%d", initCfg.ApollgoPort),
+		Addr:         addr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
+
+	apollgo.Log("Web server starting on " + addr)
 
 	srv.ListenAndServe()
 }

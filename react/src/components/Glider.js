@@ -4,7 +4,7 @@ import { Label, Select, Checkbox, Switch } from '@rebass/forms';
 import TextInput from './TextInput';
 import CSVInput from './CSVInput';
 
-export default function Glider({ config, setConfig }) {
+export default function Glider({ config, setConfig, defaults }) {
   let [editCfg, setEditCfg] = useState(config);
   useEffect(() => {
     setEditCfg(config);
@@ -16,7 +16,7 @@ export default function Glider({ config, setConfig }) {
   };
   let addListener = () => {
     let newCfg = JSON.parse(JSON.stringify(editCfg));
-    newCfg.listeners = newCfg.listeners.concat([newCfg.listeners[0]]);
+    newCfg.listeners = newCfg.listeners.concat([defaults.listeners[0]]);
     setEditCfg(newCfg);
   };
   let deleteListener = (idx) => {

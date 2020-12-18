@@ -36,6 +36,7 @@ func ServeHermes(cfg HermesConfig, log func(string)) error {
 			return err
 		}
 		go func() {
+			log(fmt.Sprintf("Running hermes :%d -> %s:%d", appPort, cfg.Server, remotePort))
 			client, err := hermesTCP.NewClient(
 				appPort, 
 				remotePort, 

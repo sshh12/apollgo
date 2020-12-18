@@ -12,18 +12,26 @@ import (
 func main() {
 	apollgo := app.NewApollgoApp("/sdcard/apollgo.json")
 	go apollgo.Run()
+	apollgo.Log("Apollgo started.")
 	go web.ServeWebApp(apollgo)
 	gliderlog.F = func(s string, v ...interface{}) { apollgo.Log(fmt.Sprintf(s, v...)) }
 	initCfg := apollgo.GetCfg()
 	if initCfg.EnableGlider {
+		apollgo.Log("Serving glider...")
 		if err := network.ServeGlider(initCfg.Listeners); err != nil {
 			apollgo.Log(err.Error())
 		}
+	} else {
+		apollgo.Log("Glider disabled by settings.")
 	}
 	if initCfg.EnableHermes {
+		apollgo.Log("Serving hermes...")
 		if err := network.ServeHermes(initCfg.HermesConfig, apollgo.Log); err != nil {
 			apollgo.Log(err.Error())
 		}
+	} else {
+		apollgo.Log("Hermes disabled by settings.")
 	}
+	apollgo.Log("Launching UI.")
 	mobileapp.Main(app.OnAppLaunch)
 }
