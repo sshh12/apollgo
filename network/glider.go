@@ -25,11 +25,23 @@ import (
 
 // ListenerConfig config for listeners
 type ListenerConfig struct {
-	URI           string   `json:"uri"`
+	URIs          []string `json:"uris"`
 	Strategy      string   `json:"strategy"`
 	Forwarders    []string `json:"forwarders"`
 	Check         string   `json:"check"`
 	CheckInterval int      `json:"checkInterval"`
+	MaxFailures   int      `json:"maxFailures"`
+	DialTimeout   int      `json:"dialTimeout"`
+	RelayTimeout  int      `json:"relayTimeout"`
+	IntFace       string   `json:"interface"`
+	DNSListener   string   `json:"dns"`
+	DNSAlwaysTCP  bool     `json:"dnsAlwaysTCP"`
+	DNSServers    []string `json:"dnsServers"`
+	DNSMaxTTL     int      `json:"dnsMaxTTL"`
+	DNSMinTTL     int      `json:"dnsMinTTL"`
+	DNSTimeout    int      `json:"dnsTimeout"`
+	DNSCacheSize  int      `json:"dnsCacheSize"`
+	DNSRecords    []string `json:"dnsRecords"`
 }
 
 // ServeGlider starts glider server
@@ -45,8 +57,8 @@ func ServeGlider(listeners []ListenerConfig) error {
 func runListener(listener *ListenerConfig) error {
 	rules := []*rule.Config{}
 	strat := &rule.Strategy{
-		Strategy: listener.Strategy,
-		Check:    listener.Check,
+		Strategy:      listener.Strategy,
+		Check:         listener.Check,
 		CheckInterval: listener.CheckInterval,
 	}
 	forwarders := make([]string, 0)
@@ -57,10 +69,15 @@ func runListener(listener *ListenerConfig) error {
 	}
 	pxy := rule.NewProxy(forwarders, strat, rules)
 	pxy.Check()
-	local, err := proxy.ServerFromURL(listener.URI, pxy)
-	if err != nil {
-		return err
+	for _, uri := range listener.URIs {
+		if uri == "" {
+			continue
+		}
+		local, err := proxy.ServerFromURL(uri, pxy)
+		if err != nil {
+			return err
+		}
+		go local.ListenAndServe()
 	}
-	go local.ListenAndServe()
 	return nil
 }

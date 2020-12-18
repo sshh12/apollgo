@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Card, Heading, Flex, Button, Text } from 'rebass';
-import { Label, Input, Select } from '@rebass/forms';
+import { Label, Input, Select, Checkbox } from '@rebass/forms';
 
 export default function Glider({ config, setConfig }) {
   let [editCfg, setEditCfg] = useState(null);
@@ -38,7 +38,6 @@ export default function Glider({ config, setConfig }) {
           {editCfg.listeners.map((list, listIdx) => (
             <>
               <ListenerSettingsCard
-                key={listIdx}
                 list={list}
                 listIdx={listIdx}
                 edit={(newList) => editListener(listIdx, newList)}
@@ -50,7 +49,7 @@ export default function Glider({ config, setConfig }) {
         </Box>
       )}
       <Box mt={4}>
-        <Button onClick={addListener}>Add Listener</Button>
+        <Button onClick={addListener}>Add Glider Instance</Button>
         {cfgChanged && (
           <Button onClick={() => setEditCfg(config)} ml={2}>
             Reset
@@ -67,6 +66,19 @@ export default function Glider({ config, setConfig }) {
 }
 
 function ListenerSettingsCard({ list, listIdx, edit, del }) {
+  let editURI = (uriIdx, newURI) => {
+    let newURIs = Object.assign([], list.uris, {
+      [uriIdx]: newURI
+    });
+    while (newURIs[newURIs.length - 1] == '') {
+      newURIs.pop();
+    }
+    newURIs.push('');
+    edit({
+      ...list,
+      uris: newURIs
+    });
+  };
   let editFoward = (forwardIdx, newForward) => {
     let newForwards = Object.assign([], list.forwarders, {
       [forwardIdx]: newForward
@@ -83,16 +95,20 @@ function ListenerSettingsCard({ list, listIdx, edit, del }) {
   let hasForward = list.forwarders.length > 0;
   return (
     <Card key={listIdx} width={1} mb={3}>
-      <Heading>{list.uri || 'Listener ' + listIdx}</Heading>
-      <TextInput
-        placeholder="SCHEME://[USER|METHOD:PASSWORD@][HOST]:PORT?PARAMS"
-        key={'uri'}
-        label={'listen on'}
-        value={list.uri}
-        onChange={(v) => {
-          edit({ ...list, uri: v });
-        }}
-      />
+      <Heading>
+        {list.uris?.filter((v) => !!v).join(', ') || 'Listener ' + listIdx}
+      </Heading>
+      <>
+        {list.uris.map((uri, uriIdx) => (
+          <TextInput
+            placeholder="SCHEME://[USER|METHOD:PASSWORD@][HOST]:PORT?PARAMS"
+            key={'uri' + uriIdx}
+            value={uri}
+            label={uri || uriIdx == 0 ? 'listen on' : '(and listen on)'}
+            onChange={(v) => editURI(uriIdx, v)}
+          />
+        ))}
+      </>
       {!hasForward ? (
         <>
           <TextInput
@@ -150,6 +166,57 @@ function ListenerSettingsCard({ list, listIdx, edit, del }) {
           />
         </Box>
       </Flex>
+      <Box mt={2}>
+        <Label>
+          <Checkbox
+            id="dodns"
+            name="dodns"
+            checked={list.dns != ''}
+            onChange={(e) => {
+              if (e.target.checked) edit({ ...list, dns: ':53' });
+              else edit({ ...list, dns: '' });
+            }}
+          />
+          Custom DNS
+        </Label>
+      </Box>
+      {list.dns != '' && (
+        <Box ml={3} mr={3}>
+          <TextInput
+            placeholder="[host]:port"
+            key={'dns'}
+            label={'listen for dns on'}
+            value={list.dns}
+            onChange={(v) => {
+              edit({ ...list, dns: v });
+            }}
+          />
+          <CSVInput
+            placeholder="host:port,[host:port]"
+            key={'dnsremote'}
+            label={'use these remote dns servers'}
+            value={list.dnsServers}
+            validate={(v) => !!v.match(/\d\.\d\.\d\.\d:\d/)}
+            onChange={(v) => {
+              edit({ ...list, dnsServers: v });
+            }}
+          />
+          <CSVInput
+            placeholder="domain/ip,[domain/ip]"
+            key={'dnsrecords'}
+            label={'include these records'}
+            value={list.dnsRecords}
+            validate={(v) =>
+              !!v.match(
+                /(?:[\w-]+\.)*([\w-]{1,63})(?:\.(?:\w{3}|\w{2}))\/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/
+              )
+            }
+            onChange={(v) => {
+              edit({ ...list, dnsServers: v });
+            }}
+          />
+        </Box>
+      )}
       <Text mt={3} color="secondary" onClick={del}>
         [delete]
       </Text>
@@ -170,5 +237,33 @@ function TextInput({ value, placeholder, label, key, onChange, type }) {
         placeholder={placeholder}
       />
     </Box>
+  );
+}
+
+function CSVInput({ value, placeholder, label, key, onChange, validate }) {
+  let [text, setText] = useState(value.join(', '));
+  let [values, setValues] = useState(value);
+  return (
+    <>
+      <TextInput
+        placeholder={placeholder}
+        key={key}
+        label={label}
+        value={text}
+        onChange={(v) => {
+          setText(v);
+          let vals = v
+            .split(',')
+            .map((item) => item.trim())
+            .filter(validate);
+          vals = [...new Set(vals)];
+          setValues(vals);
+          onChange(vals);
+        }}
+      />
+      <Text fontSize={2} fontWeight="bold" color="primary">
+        {values.map((v) => `(${v})`).join(',')}
+      </Text>
+    </>
   );
 }
