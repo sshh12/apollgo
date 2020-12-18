@@ -79,6 +79,9 @@ func ServeWebApp(apollgo *app.ApollgoApp) {
 		}
 		json.NewEncoder(w).Encode(apollgo.GetCfg())
 	})
+	router.HandleFunc("/api/config/defaults", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(app.DefaultCfg)
+	})
 	router.HandleFunc("/api/status", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(apollgo.GetStatus())
 	})

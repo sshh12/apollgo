@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Card, Heading, Flex, Button, Text } from 'rebass';
-import { Label, Input, Select, Checkbox } from '@rebass/forms';
+import { Label, Select, Checkbox, Switch } from '@rebass/forms';
+import TextInput from './TextInput';
+import CSVInput from './CSVInput';
 
 export default function Glider({ config, setConfig }) {
-  let [editCfg, setEditCfg] = useState(null);
+  let [editCfg, setEditCfg] = useState(config);
   useEffect(() => {
     setEditCfg(config);
   }, [config]);
@@ -32,6 +34,14 @@ export default function Glider({ config, setConfig }) {
         <a href="https://github.com/nadoo/glider#protocols">
           <p>See glider docs and schemes</p>
         </a>
+        {editCfg && (
+          <Switch
+            checked={editCfg.enableGlider}
+            onClick={(e) =>
+              setEditCfg({ ...editCfg, enableGlider: !editCfg.enableGlider })
+            }
+          />
+        )}
       </Box>
       {editCfg && (
         <Box mt={10} ml={4} mr={4} textAlign={'left'}>
@@ -137,7 +147,12 @@ function ListenerSettingsCard({ list, listIdx, edit, del }) {
       {hasForward && (
         <Box mt={2}>
           <Label htmlFor={'strat'}>with forward strategy</Label>
-          <Select id="strat" name="strat">
+          <Select
+            value={list.strategy}
+            id="strat"
+            name="strat"
+            onChange={(v) => edit({ ...list, strategy: v })}
+          >
             <option value={'rr'}>round robin</option>
             <option value={'ha'}>high availability</option>
             <option value={'lha'}>latency based high availability</option>
@@ -196,7 +211,7 @@ function ListenerSettingsCard({ list, listIdx, edit, del }) {
             key={'dnsremote'}
             label={'use these remote dns servers'}
             value={list.dnsServers}
-            validate={(v) => !!v.match(/\d\.\d\.\d\.\d:\d/)}
+            validate={(v) => !!v.match(/^\d+\.\d+\.\d+\.\d+:\d+$/)}
             onChange={(v) => {
               edit({ ...list, dnsServers: v });
             }}
@@ -206,7 +221,7 @@ function ListenerSettingsCard({ list, listIdx, edit, del }) {
             key={'dnsrecords'}
             label={'include these records'}
             value={list.dnsRecords}
-            validate={(v) => !!v.match(/[\w\.]+\/[A-Za-z0-9\.\.]+/)}
+            validate={(v) => !!v.match(/^[\w\.]+\/[A-Za-z0-9\.\.]+$/)}
             onChange={(v) => {
               edit({ ...list, dnsRecords: v });
             }}
@@ -217,49 +232,5 @@ function ListenerSettingsCard({ list, listIdx, edit, del }) {
         [delete]
       </Text>
     </Card>
-  );
-}
-
-function TextInput({ value, placeholder, label, key, onChange, type }) {
-  return (
-    <Box mt={2}>
-      <Label htmlFor={key}>{label}</Label>
-      <Input
-        id={key}
-        name={key}
-        type={type || 'text'}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-      />
-    </Box>
-  );
-}
-
-function CSVInput({ value, placeholder, label, key, onChange, validate }) {
-  let [text, setText] = useState(value.join(', '));
-  let [values, setValues] = useState(value);
-  return (
-    <>
-      <TextInput
-        placeholder={placeholder}
-        key={key}
-        label={label}
-        value={text}
-        onChange={(v) => {
-          setText(v);
-          let vals = v
-            .split(',')
-            .map((item) => item.trim())
-            .filter(validate);
-          vals = [...new Set(vals)];
-          setValues(vals);
-          onChange(vals);
-        }}
-      />
-      <Text fontSize={2} fontWeight="bold" color="primary">
-        {values.map((v) => `(${v})`).join(',')}
-      </Text>
-    </>
   );
 }

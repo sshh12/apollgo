@@ -4,10 +4,11 @@ import "github.com/sshh12/apollgo/network"
 
 // DefaultCfg default config
 var DefaultCfg = &Config{
-	ApollgoPort: 8888,
+	ApollgoPort:  8888,
+	EnableGlider: true,
 	Listeners: []network.ListenerConfig{
 		network.ListenerConfig{
-			URIs:          []string{"socks5://0.0.0.0:3080"},
+			URIs:          []string{"socks5://:3080"},
 			Strategy:      "rr",
 			Check:         "https://google.com",
 			CheckInterval: 300,
@@ -26,10 +27,20 @@ var DefaultCfg = &Config{
 			DNSRecords:    []string{},
 		},
 	},
+	EnableHermes: false,
+	HermesConfig: network.HermesConfig{
+		Password:     "",
+		HermesPort:   4000,
+		Server:       "127.0.0.1",
+		ForwardPairs: []string{"8888/80"},
+	},
 }
 
 // Config server config
 type Config struct {
-	Listeners   []network.ListenerConfig `json:"listeners"`
-	ApollgoPort int                      `json:"apollgoPort"`
+	Listeners    []network.ListenerConfig `json:"listeners"`
+	ApollgoPort  int                      `json:"apollgoPort"`
+	EnableGlider bool                     `json:"enableGlider"`
+	EnableHermes bool `json:"enableHermes"`
+	HermesConfig network.HermesConfig     `json:"hermesConfig"`
 }

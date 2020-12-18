@@ -79,6 +79,10 @@ func (s *ApollgoApp) Run() {
 func (s *ApollgoApp) Log(val string) {
 	s.statusLock.Lock()
 	defer s.statusLock.Unlock()
+	newLog := LogLine{
+		Time: time.Now().Unix(),
+		Text: val,
+	}
 	s.status.Logs = append(s.status.Logs, newLog)
 	if len(s.status.Logs) > 1000 {
 		extra := 1000 - len(s.status.Logs)

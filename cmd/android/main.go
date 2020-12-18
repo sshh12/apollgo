@@ -15,8 +15,15 @@ func main() {
 	go web.ServeWebApp(apollgo)
 	gliderlog.F = func(s string, v ...interface{}) { apollgo.Log(fmt.Sprintf(s, v...)) }
 	initCfg := apollgo.GetCfg()
-	if err := network.ServeGlider(initCfg.Listeners); err != nil {
-		apollgo.Log(err.Error())
+	if initCfg.EnableGlider {
+		if err := network.ServeGlider(initCfg.Listeners); err != nil {
+			apollgo.Log(err.Error())
+		}
+	}
+	if initCfg.EnableHermes {
+		if err := network.ServeHermes(initCfg.HermesConfig, apollgo.Log); err != nil {
+			apollgo.Log(err.Error())
+		}
 	}
 	mobileapp.Main(app.OnAppLaunch)
 }

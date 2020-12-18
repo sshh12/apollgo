@@ -5,12 +5,14 @@ import theme from './theme';
 import { Box, Text, Flex, Link } from 'rebass';
 import Glider from './components/Glider';
 import Status from './components/Status';
+import Hermes from './components/Hermes';
 import Logs from './components/Logs';
 import api from './api';
 
 const TABS = {
   status: Status,
   glider: Glider,
+  hermes: Hermes,
   logs: Logs
 };
 
