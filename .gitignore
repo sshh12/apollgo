@@ -20,3 +20,4 @@ node_modules
 assets/
 react/build
 .eslintcache
+*.zip
